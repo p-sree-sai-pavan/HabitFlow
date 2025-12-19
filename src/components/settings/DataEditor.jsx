@@ -9,14 +9,13 @@ const DataEditor = () => {
     const {
         habits,
         habitHistory,
-        setHabitHistory,
+        toggleHabit, // Use toggleHabit for proper streak recalculation
         studyLogs,
         setStudyLogs,
-        recalculateGamification
     } = useHabitFlow();
 
     const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-    const [editedHabits, setEditedHabits] = useState({});
+    const [pendingChanges, setPendingChanges] = useState({}); // Track pending changes
     const [hasChanges, setHasChanges] = useState(false);
 
     // Get last 30 days for quick selection
@@ -26,11 +25,18 @@ const DataEditor = () => {
     });
 
     const currentDayData = habitHistory[selectedDate] || {};
+
+    // Helper to check if a habit entry is completed (handles both boolean and object formats)
+    const isHabitCompleted = (entry) => {
+        if (!entry) return false;
+        return typeof entry === 'object' ? entry.completed === true : entry === true;
+    };
+
     const dayStudyLogs = studyLogs.filter(log => log.date === selectedDate);
 
     const handleHabitToggle = (habitId) => {
-        const currentValue = editedHabits[habitId] ?? currentDayData[habitId] ?? false;
-        setEditedHabits(prev => ({
+        const currentValue = pendingChanges[habitId] ?? isHabitCompleted(currentDayData[habitId]);
+        setPendingChanges(prev => ({
             ...prev,
             [habitId]: !currentValue
         }));
@@ -38,21 +44,17 @@ const DataEditor = () => {
     };
 
     const handleSaveChanges = () => {
-        // Update habit history
-        setHabitHistory(prev => ({
-            ...prev,
-            [selectedDate]: {
-                ...prev[selectedDate],
-                ...editedHabits
+        // Apply each pending change using toggleHabit for proper gamification recalculation
+        Object.entries(pendingChanges).forEach(([habitId, shouldBeCompleted]) => {
+            const currentlyCompleted = isHabitCompleted(currentDayData[habitId]);
+
+            // Only toggle if the state is different from what we want
+            if (currentlyCompleted !== shouldBeCompleted) {
+                toggleHabit(selectedDate, habitId);
             }
-        }));
+        });
 
-        // Recalculate gamification if the function exists
-        if (typeof recalculateGamification === 'function') {
-            recalculateGamification();
-        }
-
-        setEditedHabits({});
+        setPendingChanges({});
         setHasChanges(false);
         alert('Changes saved! XP and streaks have been recalculated.');
     };
@@ -65,7 +67,7 @@ const DataEditor = () => {
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
-        setEditedHabits({});
+        setPendingChanges({});
         setHasChanges(false);
     };
 
@@ -112,8 +114,8 @@ const DataEditor = () => {
                 <h4>Habit Completions for {format(parseISO(selectedDate), 'MMMM d, yyyy')}</h4>
                 <div className={styles.habitEditList}>
                     {habits.map(habit => {
-                        const isCompleted = editedHabits[habit.id] ?? currentDayData[habit.id] ?? false;
-                        const hasEdit = editedHabits[habit.id] !== undefined;
+                        const isCompleted = pendingChanges[habit.id] ?? isHabitCompleted(currentDayData[habit.id]);
+                        const hasEdit = pendingChanges[habit.id] !== undefined;
 
                         return (
                             <motion.div

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, subDays, parseISO, isWithinInterval, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, subDays, addDays, parseISO, isWithinInterval, isToday } from 'date-fns';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
@@ -10,7 +10,7 @@ import {
   XP_PER_HABIT,
   BADGE_THRESHOLDS,
   SAVE_DEBOUNCE_MS,
-  STREAK_COMPLETION_THRESHOLD,
+  STREAK_MIN_HABITS,
   generateId
 } from '../utils/constants';
 import LoadingSkeleton from '../components/common/LoadingSkeleton';
@@ -18,6 +18,66 @@ import LoadingSkeleton from '../components/common/LoadingSkeleton';
 const HabitFlowContext = createContext();
 
 export const useHabitFlow = () => useContext(HabitFlowContext);
+
+// Helper function to check if a habit is scheduled for a specific date
+const isScheduledForDate = (habit, date) => {
+  if (!habit.frequency || habit.frequency === 'daily') return true;
+  const dayOfWeek = date.getDay(); // 0=Sun, 6=Sat
+
+  if (habit.frequency === 'weekdays') return dayOfWeek !== 0 && dayOfWeek !== 6;
+  if (habit.frequency === 'weekends') return dayOfWeek === 0 || dayOfWeek === 6;
+  if (habit.frequency === 'custom' && Array.isArray(habit.customDays)) {
+    return habit.customDays.includes(dayOfWeek);
+  }
+  return true;
+};
+
+// Pure function to recalculate streak during data load
+// This is defined outside the component to avoid hoisting issues
+const recalculateStreakOnLoad = (habitHistory, habits) => {
+  let streak = 0;
+  let checkDate = new Date();
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  let isFirstDay = true;
+
+  for (let i = 0; i < 365; i++) {
+    const dateStr = format(checkDate, 'yyyy-MM-dd');
+    const dayData = habitHistory[dateStr] || {};
+
+    // Filter habits that were actually scheduled for this day
+    const scheduledHabits = habits.filter(h => isScheduledForDate(h, checkDate));
+
+    if (scheduledHabits.length === 0) {
+      // Rest day - skip but don't break streak
+      checkDate = subDays(checkDate, 1);
+      isFirstDay = false;
+      continue;
+    }
+
+    const completedCount = scheduledHabits.filter(h => {
+      const entry = dayData[h.id];
+      return entry && (typeof entry === 'object' ? entry.completed === true : entry === true);
+    }).length;
+
+    // At least 1 habit completed = streak continues
+    const meetsThreshold = completedCount >= STREAK_MIN_HABITS;
+
+    if (meetsThreshold) {
+      streak++;
+      checkDate = subDays(checkDate, 1);
+      isFirstDay = false;
+    } else {
+      // Allow today to be incomplete without breaking streak
+      if (isFirstDay && dateStr === todayStr) {
+        checkDate = subDays(checkDate, 1);
+        isFirstDay = false;
+        continue;
+      }
+      break;
+    }
+  }
+  return streak;
+};
 
 export const HabitFlowProvider = ({ children }) => {
   const { user } = useAuth();
@@ -167,10 +227,22 @@ export const HabitFlowProvider = ({ children }) => {
         if (userDoc.exists()) {
           const data = userDoc.data();
           console.log('[SkillOS] ✅ Loaded data from Firestore:', Object.keys(data));
-          setHabits(data.habits || DEFAULT_HABITS);
-          setHabitHistory(data.habitHistory || {});
+
+          const loadedHabits = data.habits || DEFAULT_HABITS;
+          const loadedHistory = data.habitHistory || {};
+          const loadedGamification = data.gamification || { xp: 0, level: 1, badges: [], streak: 0 };
+
+          // Recalculate streak on load to apply current logic
+          const recalculatedStreak = recalculateStreakOnLoad(loadedHistory, loadedHabits);
+          console.log('[HabitFlow] Streak on load:', loadedGamification.streak, '->', recalculatedStreak);
+
+          setHabits(loadedHabits);
+          setHabitHistory(loadedHistory);
           setStudyLogs(data.studyLogs || []);
-          setGamification(data.gamification || { xp: 0, level: 1, badges: [], streak: 0 });
+          setGamification({
+            ...loadedGamification,
+            streak: recalculatedStreak // Use recalculated streak
+          });
           setShareableProgress(data.shareableProgress || {});
           setArchivedHabits(data.archivedHabits || []);
           setCompletedHabits(data.completedHabits || []);
@@ -385,10 +457,8 @@ export const HabitFlowProvider = ({ children }) => {
         const newXP = Math.max(0, currentGamification.xp + xpChange);
         const newLevel = Math.floor(newXP / XP_PER_LEVEL) + 1;
 
-        // Recalculate streaks only if completion status changed
-        const currentStreak = (wasCompleted === isNowCompleted)
-          ? currentGamification.streak
-          : calculateCurrentStreak(newHistory, habits);
+        // Always recalculate streaks to avoid stale values (e.g., day changed since last action)
+        const currentStreak = calculateCurrentStreak(newHistory, habits);
 
         // Re-check badges
         const badges = updateBadges(currentGamification.badges, currentStreak);
@@ -449,6 +519,8 @@ export const HabitFlowProvider = ({ children }) => {
   const calculateCurrentStreak = (currentHabitHistory, currentHabits) => {
     let streak = 0;
     let checkDate = new Date();
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    let isFirstDay = true; // Track if we're checking today
 
     // Safety check loop limit
     for (let i = 0; i < 365; i++) {
@@ -462,28 +534,32 @@ export const HabitFlowProvider = ({ children }) => {
         // If no habits scheduled today (e.g. Sunday rest day), streak continues!
         // We just skip this day and look back further
         checkDate = subDays(checkDate, 1);
+        isFirstDay = false;
         continue;
       }
 
+
       const completedCount = scheduledHabits.filter(h => {
         const entry = dayData[h.id];
-        return typeof entry === 'object' ? entry?.completed : !!entry;
+        // Properly check completion status for both boolean and object entries
+        return entry && (typeof entry === 'object' ? entry.completed === true : entry === true);
       }).length;
 
-      // Threshold: Did they do X% of scheduled habits?
-      if (completedCount >= scheduledHabits.length * STREAK_COMPLETION_THRESHOLD) {
+      // Check if at least STREAK_MIN_HABITS habits were completed (matches heatmap logic)
+      const meetsThreshold = completedCount >= STREAK_MIN_HABITS;
+
+      if (meetsThreshold) {
         streak++;
         checkDate = subDays(checkDate, 1);
+        isFirstDay = false;
       } else {
-        // Only break streak if it wasn't today (today allows partial progress until day ends)
-        // Actually for simplicity, if not done, streak ends.
-        // But if today is incomplete, streak shouldn't be 0 if yesterday was done.
-        if (isWithinInterval(checkDate, { start: new Date(), end: new Date() })) {
-          // If checking today and failed, maybe they just haven't finished yet. 
-          // Look at yesterday to confirm previous streak.
+        // If today is incomplete, don't break streak yet - check yesterday
+        if (isFirstDay && dateStr === todayStr) {
           checkDate = subDays(checkDate, 1);
-          continue; // Don't increment streak for today yet, but don't break logic
+          isFirstDay = false;
+          continue; // Don't increment streak for today, but continue checking yesterday
         }
+        // Otherwise, streak is broken
         break;
       }
     }
@@ -787,69 +863,80 @@ export const HabitFlowProvider = ({ children }) => {
 
     let current = 0;
     let longest = 0;
-    let tempCurrent = 0;
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-    // Sort dates to ensure chronological order
-    const sortedDates = Object.keys(habitHistory).sort();
+    // Helper to check if a habit entry is completed
+    const isCompleted = (entry) => {
+      if (!entry) return false;
+      return typeof entry === 'object' ? entry.completed === true : entry === true;
+    };
 
-    // 1. Calculate Longest Streak (Historical)
-    // For specific habit streak, we iterate history.
-    // Simplifying assumption: We iterate all days in history range? 
-    // Or just iterate existing history entries?
-    // Using existing history is safer for "longest" calc.
-
-    // Actually, to be strictly correct with "Rest Days", we should iterate valid dates.
-    // If a range has gaps (rest days), streak shouldn't break.
-    // This is complex. Let's use a simpler heuristic for now that matches standard behavior:
-    // Only check history entries that exist. 
-    // But wait, if I have MWF schedule, and I do M, W, F... T and Th breaks the streak if I just check dates.
-
-    // Correct approach: Iterate days backwards from Today for Current Streak.
+    // --- Calculate Current Streak ---
+    // Iterate days backwards from Today, respecting habit schedule
     let checkDate = new Date();
-    // Loop back 365 days or until broken
+    let isFirstDay = true;
+
     for (let i = 0; i < 365; i++) {
+      // Skip rest days (not scheduled)
       if (!isHabitScheduled(habit, checkDate)) {
         checkDate = subDays(checkDate, 1);
-        continue; // Skip rest day
+        isFirstDay = false;
+        continue;
       }
 
       const dateStr = format(checkDate, 'yyyy-MM-dd');
-      const isDone = habitHistory[dateStr]?.[habitId];
+      const isDone = isCompleted(habitHistory[dateStr]?.[habitId]);
 
       if (isDone) {
         current++;
         checkDate = subDays(checkDate, 1);
+        isFirstDay = false;
       } else {
-        // Allow today to be incomplete without breaking if it's "Today"
-        if (isToday(checkDate)) {
+        // Allow today to be incomplete without breaking streak
+        if (isFirstDay && dateStr === todayStr) {
           checkDate = subDays(checkDate, 1);
+          isFirstDay = false;
           continue;
         }
         break;
       }
     }
 
-    // Longest Streak is harder to retroactive calculate with dynamic schedule changes.
-    // We will stick to the generic "consecutive recorded days" for longest for now, 
-    // or just return current until we implement full event-sourced streak recalc.
-    // Let's use the local implementation's logic but filtered by schedule?? 
-    // No, let's keep it simple: Longest = Current (unless we track it separately in metadata).
-    // Actually, users hate losing "Longest".
-    // Let's use a basic calculation for Longest based on *recorded* history, ignoring schedule changes for the past (too hard to know historic schedule).
+    // --- Calculate Longest Streak (Schedule-Aware) ---
+    // Get the earliest and latest dates in history to define the range
+    const sortedDates = Object.keys(habitHistory).sort();
+    if (sortedDates.length === 0) {
+      return { current, longest: Math.max(current, 0) };
+    }
 
+    const startDate = parseISO(sortedDates[0]);
+    const endDate = new Date();
+
+    // Iterate through all days from start to end
     let tempStreak = 0;
-    sortedDates.forEach(dateStr => {
-      if (habitHistory[dateStr]?.[habitId]) {
+    let iterDate = startDate;
+
+    while (iterDate <= endDate) {
+      // Skip rest days (not scheduled)
+      if (!isHabitScheduled(habit, iterDate)) {
+        iterDate = addDays(iterDate, 1);
+        continue; // Rest day doesn't break streak
+      }
+
+      const dateStr = format(iterDate, 'yyyy-MM-dd');
+      const isDone = isCompleted(habitHistory[dateStr]?.[habitId]);
+
+      if (isDone) {
         tempStreak++;
         longest = Math.max(longest, tempStreak);
       } else {
-        // Only reset if it WAS a scheduled day? We don't know historic schedule.
-        // Assuming simplified longest streak (consecutive days of action).
-        tempStreak = 0;
+        tempStreak = 0; // Reset streak only on scheduled days not completed
       }
-    });
 
-    // Update longest if current is higher (since current logic handles rest days better)
+      iterDate = addDays(iterDate, 1);
+    }
+
+    // Ensure longest is at least current
     longest = Math.max(longest, current);
 
     return { current, longest };

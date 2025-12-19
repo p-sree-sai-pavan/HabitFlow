@@ -48,8 +48,9 @@ export const MAX_GOAL = 100;
 export const MIN_STUDY_HOURS = 0.5;
 export const MAX_STUDY_HOURS = 24;
 
-// Streak calculation threshold (percentage of habits needed to count as "completed day")
-export const STREAK_COMPLETION_THRESHOLD = 0.5; // 50%
+// Streak calculation threshold - minimum number of habits to count as "completed day"
+// Set to 1 to match heatmap behavior (any activity = streak continues)
+export const STREAK_MIN_HABITS = 1; // At least 1 habit completed
 
 // Generate unique ID (replaces Date.now() to avoid collisions)
 export const generateId = () => {
