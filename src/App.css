@@ -1,0 +1,325 @@
+/* App Container */
+.app {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Main Content Area */
+/* Main Content Area */
+.main-content {
+  min-height: 100vh;
+  padding-top: calc(var(--navbar-height) + var(--space-6));
+}
+
+/* Add bottom padding on mobile to clear bottom navigation */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: calc(var(--bottom-nav-height) + var(--space-6));
+  }
+}
+
+/* Page Transitions */
+.pageEnter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.pageEnterActive {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.pageExit {
+  opacity: 1;
+}
+
+.pageExitActive {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Toast Notifications */
+.toastContainer {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Move toast above bottom nav on mobile */
+@media (max-width: 768px) {
+  .toastContainer {
+    bottom: calc(var(--bottom-nav-height) + var(--space-4));
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 280px;
+  max-width: 400px;
+}
+
+.toast.success {
+  border-left: 3px solid var(--success);
+}
+
+.toast.error {
+  border-left: 3px solid var(--error);
+}
+
+.toast.warning {
+  border-left: 3px solid var(--warning);
+}
+
+.toastIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toast.success .toastIcon {
+  color: var(--success);
+}
+
+.toast.error .toastIcon {
+  color: var(--error);
+}
+
+.toast.warning .toastIcon {
+  color: var(--warning);
+}
+
+.toastContent {
+  flex: 1;
+}
+
+.toastTitle {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.toastMessage {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.toastClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.toastClose:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* Global Loading */
+.globalLoading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Offline Indicator */
+.offlineBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--warning);
+  color: white;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-align: center;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.offlineBar span {
+  flex: 1;
+}
+
+.offlineDismiss {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.offlineDismiss:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Error Fallback */
+.errorFallback {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.errorIcon {
+  width: 64px;
+  height: 64px;
+  color: var(--error);
+  margin-bottom: var(--space-4);
+}
+
+.errorTitle {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-2);
+}
+
+.errorMessage {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+  max-width: 400px;
+}
+
+.errorBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.errorBtn:hover {
+  background: var(--primary-hover);
+}
+
+/* ===== ENHANCED MOBILE RESPONSIVENESS ===== */
+
+/* Smaller screens (375px and below) */
+@media (max-width: 375px) {
+  :root {
+    --space-4: 12px;
+    --space-5: 16px;
+    --space-6: 20px;
+    --text-2xl: 1.375rem;
+    --text-3xl: 1.625rem;
+  }
+
+  .main-content {
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+}
+
+/* Touch-friendly improvements for all mobile */
+@media (max-width: 768px) {
+
+  /* Larger touch targets */
+  button,
+  [role="button"],
+  a,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent text selection on interactive elements */
+  button,
+  [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Smooth transitions for mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Medium tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  .main-content {
+    padding: calc(var(--navbar-height) + var(--space-4)) var(--space-4) calc(var(--bottom-nav-height) + var(--space-4));
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+  .main-content {
+    padding-top: calc(var(--navbar-height) + var(--space-3));
+    padding-bottom: calc(var(--bottom-nav-height) + var(--space-3));
+  }
+
+  /* Reduce bottom nav height in landscape */
+  :root {
+    --bottom-nav-height: 50px;
+  }
+}

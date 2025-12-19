@@ -1,0 +1,252 @@
+/* ===== DESIGN SYSTEM (Golden Ratio φ ≈ 1.618) ===== */
+
+:root {
+  /* Navbar Height */
+  --navbar-height: 64px;
+  --bottom-nav-height: 60px;
+
+  /* Spacing Scale (Fibonacci-inspired, practical) */
+  --space-1: 4px;
+  /* Base */
+  --space-2: 8px;
+  /* 4 × 2 */
+  --space-3: 12px;
+  /* Comfortable gap */
+  --space-4: 16px;
+  /* Standard padding */
+  --space-5: 24px;
+  /* Section gap */
+  --space-6: 32px;
+  /* Large gap */
+  --space-8: 32px;
+  /* Alias (backward compat) */
+  --space-10: 40px;
+  /* Extra large */
+  --space-12: 48px;
+  /* Section padding */
+  --space-16: 64px;
+  /* Page sections */
+
+  /* Border Radius (Fibonacci inspired) */
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 13px;
+  --radius-xl: 21px;
+  --radius-full: 9999px;
+
+  /* ===== COMPONENT SIZES ===== */
+
+  /* Button Heights */
+  --btn-sm: 32px;
+  --btn-md: 40px;
+  --btn-lg: 48px;
+
+  /* Input/Form Sizes */
+  --input-height: 44px;
+  --input-height-lg: 48px;
+
+  /* Touch Targets (Apple HIG / Material) */
+  --touch-target: 44px;
+  --touch-target-lg: 48px;
+
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1400px;
+
+  /* Component-specific Sizes */
+  --checkbox-size: 20px;
+  --checkbox-touch: 44px;
+  --toggle-width: 44px;
+  --toggle-height: 24px;
+  --toggle-thumb: 20px;
+  --progress-ring: 80px;
+  --heatmap-cell: 13px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+
+  /* Golden Ratio Typography Scale (Precise) */
+  --text-xs: 0.625rem;
+  /* 10px */
+  --text-sm: 0.875rem;
+  /* 14px */
+  --text-base: 1rem;
+  /* 16px - base */
+  --text-lg: 1.125rem;
+  /* 18px */
+  --text-xl: 1.618rem;
+  /* 26px = 16 × 1.618 (exact) */
+  --text-2xl: 2.618rem;
+  /* 42px = 1.618² */
+  --text-3xl: 4.236rem;
+  /* 68px = 1.618³ */
+  --text-4xl: 6.854rem;
+  /* 110px = 1.618⁴ */
+
+  /* Golden Line Height */
+  --line-height: 1.618;
+  --line-height-tight: 1.382;
+  /* 1 / 0.618 complement */
+  --line-height-relaxed: 1.8;
+
+  /* Shadows (unchanged) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* Optimized Animation Timing (Research-validated) */
+  --transition-fast: 150ms ease;
+  /* Micro-interactions */
+  --transition: 250ms ease;
+  /* Standard UI */
+  --transition-slow: 400ms ease;
+  /* Complex animations */
+
+  /* Golden Easing (approximates natural movement) */
+  --ease-golden: cubic-bezier(0.618, 0.0, 0.382, 1.0);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Golden Layout Ratios */
+  --golden-large: 61.8%;
+  --golden-small: 38.2%;
+
+  /* Responsive Breakpoints (Standardized) */
+  --breakpoint-sm: 640px;
+  /* Mobile landscape */
+  --breakpoint-md: 768px;
+  /* Tablet */
+  --breakpoint-lg: 1024px;
+  /* Desktop */
+  --breakpoint-xl: 1400px;
+  /* Wide desktop */
+
+  /* Primary Color (Vibrant Purple) */
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --primary-active: #6d28d9;
+  --primary-soft: rgba(139, 92, 246, 0.15);
+  --primary-glow: rgba(139, 92, 246, 0.4);
+
+  /* Status Colors (Brighter for Gamification) */
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.15);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.15);
+  --error: #f87171;
+  --error-soft: rgba(248, 113, 113, 0.15);
+  --info: #60a5fa;
+  --info-soft: rgba(96, 165, 250, 0.15);
+
+  /* Gamification Colors */
+  --streak: #fb923c;
+  --streak-glow: rgba(251, 146, 60, 0.3);
+  --xp: #a78bfa;
+  --badge-gold: #ffd700;
+  --badge-silver: #c0c0c0;
+  --badge-bronze: #cd7f32;
+
+  /* Heatmap Colors (Purple Gradient) */
+  --heat-0: #1a1a2e;
+  --heat-1: #2d1b4e;
+  --heat-2: #4c287d;
+  --heat-3: #7c3aed;
+  --heat-4: #a78bfa;
+}
+
+/* ===== LIGHT THEME (Research-backed) ===== */
+:root,
+[data-theme="light"] {
+  /* Backgrounds (warm white - reduces eye strain) */
+  --bg: #FAFBFC;
+  --bg-subtle: #F1F5F9;
+  --bg-rgb: 250, 251, 252;
+
+  /* Surfaces */
+  --surface: #FFFFFF;
+  --surface-hover: #F8FAFC;
+  --surface-active: #F1F5F9;
+
+  /* Borders (soft) */
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Text (soft black - high contrast but not harsh) */
+  --text: #1A1A2E;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  /* Primary (vibrant for engagement) */
+  --primary-soft: rgba(124, 58, 237, 0.1);
+
+  /* Shadows (soft and diffused) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+  /* Heatmap for light mode (lighter purple gradient) */
+  --heat-0: #F1F5F9;
+  --heat-1: #E0D4FC;
+  --heat-2: #C4B5FD;
+  --heat-3: #A78BFA;
+  --heat-4: #8B5CF6;
+}
+
+/* ===== DARK THEME ===== */
+[data-theme="dark"] {
+  --bg: #121212;
+  /* Softer black (Material Design) */
+  --bg-subtle: #1a1a1a;
+  --bg-rgb: 18, 18, 18;
+
+  --surface: #1e1e1e;
+  /* Card background */
+  --surface-hover: #2a2a2a;
+  --surface-active: #333333;
+
+  --border: #2a2a2a;
+  --border-strong: #404040;
+
+  --text: #fafafa;
+  --text-secondary: #d4d4d4;
+  --text-muted: #9ca3af;
+
+  --primary-soft: rgba(139, 92, 246, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+}
+
+/* System preference detection */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --bg-subtle: #1a1a1a;
+    --bg-rgb: 18, 18, 18;
+
+    --surface: #1e1e1e;
+    --surface-hover: #2a2a2a;
+    --surface-active: #333333;
+
+    --border: #2a2a2a;
+    --border-strong: #404040;
+
+    --text: #fafafa;
+    --text-secondary: #d4d4d4;
+    --text-muted: #9ca3af;
+
+    --primary-soft: rgba(139, 92, 246, 0.15);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+  }
+}

@@ -1,0 +1,632 @@
+.container {
+  /* Map legacy variables to system variables */
+  --bg-card: var(--surface);
+  --bg-hover: var(--surface-hover);
+  --color-accent: var(--primary);
+  --border-color: var(--border);
+  --text-primary: var(--text);
+  --bg-input: var(--bg-subtle);
+  --text-disabled: var(--text-muted);
+  --bg-dash: var(--bg);
+
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.iconBtn:hover,
+.activeBtn {
+  background: var(--color-accent);
+  color: white;
+}
+
+.addHabitBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addHabitBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-hover);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  animation: fadeIn 0.2s;
+}
+
+.bulkActionBtn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.bulkActionBtn:hover {
+  background: var(--bg-card);
+}
+
+.rowCheckbox {
+  margin-right: 0.75rem;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent);
+}
+
+.selectedRow {
+  background: var(--primary-soft);
+}
+
+.legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dotDone,
+.dotMissed {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dotDone {
+  background-color: var(--color-accent);
+}
+
+.dotMissed {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+}
+
+.gridContainer {
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+  /* Ensure scrolling on small screens */
+}
+
+.habitHeader,
+.goalHeader {
+  text-align: left;
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  background: var(--bg-card);
+  z-index: 10;
+  min-width: 180px;
+}
+
+.goalHeader {
+  left: 180px;
+  /* Match width of habitHeader */
+  min-width: 60px;
+  text-align: center;
+  border-right: 1px solid var(--border-color);
+}
+
+.habitName {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  position: sticky;
+  left: 0;
+  background: var(--bg-card);
+  z-index: 10;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.habitNameWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+/* Hover Actions for Edit/Delete */
+.rowActions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: auto;
+}
+
+.habitNameWrapper:hover .rowActions {
+  opacity: 1;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.habitColorStrip {
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.habitGoal {
+  text-align: center;
+  color: var(--text-secondary);
+  position: sticky;
+  left: 180px;
+  background: var(--bg-card);
+  z-index: 10;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dayHeader {
+  padding: 0.5rem;
+  min-width: 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.todayHeader {
+  background: var(--primary-soft);
+  border-top: 2px solid var(--color-accent);
+}
+
+.dayName {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.dayNum {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 0.2rem;
+}
+
+.cell {
+  text-align: center;
+  padding: 0.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.today {
+  background: var(--primary-soft);
+}
+
+.restDay {
+  background: var(--bg-hover);
+  opacity: 0.5;
+}
+
+.restDayIcon {
+  color: var(--text-disabled);
+  font-size: 1.5rem;
+  line-height: 0;
+}
+
+.checkboxWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  cursor: pointer;
+}
+
+.noteIndicator {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-accent);
+  border-radius: 50%;
+  border: 1px solid var(--bg-card);
+}
+
+.checkbox {
+  appearance: none;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition) var(--ease-golden);
+  position: relative;
+  background: var(--bg-input);
+}
+
+/* Hover state - subtle glow */
+.checkbox:hover:not(:checked):not(:disabled) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+}
+
+/* Checked state - satisfying completion feel */
+.checkbox:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  animation: checkBounce 0.4s var(--ease-bounce);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* Checkmark icon */
+.checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: checkmarkPop 0.3s ease-out;
+}
+
+/* Uncheck animation - subtle shrink */
+.checkbox:not(:checked) {
+  animation: uncheckShrink 0.2s ease-out;
+}
+
+.disabledCheckbox {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-dash);
+}
+
+.disabledCheckbox:hover {
+  box-shadow: none;
+  border-color: var(--border-color);
+}
+
+.futureCell {
+  color: var(--text-disabled);
+  font-size: 1.2rem;
+}
+
+.statsHeader {
+  padding: 1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  min-width: 80px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.doneCount,
+.streak {
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subStreak {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: 0.2rem;
+}
+
+.percentage {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.progressText {
+  font-size: 0.8rem;
+  text-align: right;
+  margin-bottom: 0.2rem;
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-accent);
+}
+
+/* Enhanced bounce animation for check */
+@keyframes checkBounce {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.25);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
+
+  70% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Checkmark pop-in animation */
+@keyframes checkmarkPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Uncheck shrink animation */
+@keyframes uncheckShrink {
+  0% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Habit Tracker Styles */
+
+.emptyState {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.emptyContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.emptyBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.emptyBtn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header h2 {
+    font-size: 1.25rem;
+  }
+
+  .controlsRow {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .addHabitBtn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .legend {
+    display: none;
+    /* Hide on very small screens */
+  }
+
+  .rowActions {
+    opacity: 1;
+    /* Always visible on mobile */
+  }
+
+  .grid {
+    min-width: 600px;
+    /* Reduced minimum for better mobile scroll */
+  }
+
+  .habitName {
+    min-width: 140px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .dayHeader {
+    min-width: 36px;
+    padding: 0.375rem;
+  }
+
+  .dayName {
+    font-size: 0.65rem;
+  }
+
+  .dayNum {
+    font-size: 0.875rem;
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+  }
+
+  .statsHeader {
+    min-width: 60px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 375px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .header h2 {
+    font-size: 1.125rem;
+  }
+
+  .addHabitBtn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .iconBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .grid {
+    min-width: 500px;
+  }
+
+  .habitName {
+    min-width: 120px;
+    font-size: 0.85rem;
+  }
+
+  .dayHeader {
+    min-width: 32px;
+  }
+
+  .checkbox {
+    width: 16px;
+    height: 16px;
+  }
+}

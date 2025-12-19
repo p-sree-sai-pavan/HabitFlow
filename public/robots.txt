@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://skillos-3ad66.web.app/sitemap.xml
+
+

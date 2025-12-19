@@ -1,0 +1,47 @@
+/* DashboardPage Styles */
+
+.container {
+  padding: var(--space-6) var(--space-4) calc(var(--bottom-nav-height) + var(--space-6));
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-height: 100vh;
+}
+
+.mainGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Responsive Grid */
+@media (min-width: 1024px) {
+  .container {
+    padding: var(--space-8);
+  }
+
+  .mainGrid {
+    display: grid;
+    grid-template-columns: 1.618fr 1fr;
+    /* Golden ratio: 62% / 38% */
+    /* Habit Tracker takes more space, Gamification on side */
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+.gamificationSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Ensure sticky sidebar on desktop */
+@media (min-width: 1024px) {
+  .gamificationSection {
+    position: sticky;
+    top: calc(var(--navbar-height) + var(--space-8));
+  }
+}
