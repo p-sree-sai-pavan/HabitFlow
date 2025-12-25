@@ -1,3 +1,8 @@
+# Environment variables (IMPORTANT: Keep your secrets safe!)
+.env
+.env.local
+.env.*.local
+
 # Logs
 logs
 *.log
